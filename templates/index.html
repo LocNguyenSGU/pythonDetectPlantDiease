@@ -1,61 +1,229 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <title>Tải lên ảnh</title>
     <style>
-        img {
-            max-width: 100%;
-            height: auto;
-        }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      body {
+        background-image: url("../static/backgroundimage/bg_image_plant.jpg");
+        color: red;
+        background-size: 1900px 1300px;
+        font-family: "Roboto", sans-serif;
+      }
+      input[type="file"] {
+        width: 350px;
+        max-width: 100%;
+        color: #444;
+        padding: 5px;
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #555;
+      }
+
+      input[type="file"]::file-selector-button {
+        margin-right: 20px;
+        border: none;
+        background: #084cdf;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.2s ease-in-out;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background: #0d45a5;
+      }
+
+      .drop-container {
+        width: 420px;
+        position: relative;
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 160px;
+        padding: 20px;
+        border-radius: 10px;
+        border: 2px dashed #555;
+        color: #444;
+        cursor: pointer;
+        transition: background 0.2s ease-in-out, border 0.2s ease-in-out;
+      }
+
+      .drop-container:hover {
+        background: #eee;
+        border-color: #111;
+      }
+
+      .drop-container:hover .drop-title {
+        color: #222;
+      }
+
+      .drop-title {
+        color: #444;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        transition: color 0.2s ease-in-out;
+      }
+      .row-post-image-display {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        height: 300px;
+        justify-content: center;
+        transition: all 0.5s ease-in-out, transform 0.5s ease-in-out;
+      }
+      #image-preview {
+        opacity: 0; /* Ban đầu ẩn ảnh */
+        height: 100%;
+        transform: translateX(50px); /* Di chuyển ảnh sang bên phải */
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* Cài đặt hiệu ứng cho ảnh */
+      }
+      #image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      #image-preview.show {
+        opacity: 1; /* Khi ảnh hiển thị, làm cho ảnh xuất hiện */
+        transform: translateX(0); /* Di chuyển ảnh về vị trí ban đầu */
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div
+      class="header"
+      style="
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div class="logo" style="width: 48px">
+        <img src="../static/backgroundimage/logo_desctop@2x.webp" />
+      </div>
+      <span
+        style="
+          font-weight: 700;
+          font-size: 35px;
+          line-height: 34px;
+          color: #2c6455;
+        "
+        >Blossom</span
+      >
+    </div>
     <h1>Chọn và tải lên ảnh</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <label for="image">Chọn ảnh:</label>
-        <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(event)">
-        <br><br>
-        <button type="submit">Tải lên</button>
-    </form>
-
-    <div id="image-preview">
+    <div class="row-post-image-display">
+      <form method="POST" enctype="multipart/form-data">
+        <label for="image" class="drop-container" id="dropcontainer">
+          <span class="drop-title">Drop files here</span>
+          or
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+            required
+            onchange="previewImage(event)"
+          />
+        </label>
+        <br /><br />
+        <button type="submit">Dự đoán bệnh</button>
+        <button type="button" id="cancel-button" onclick="clearImage()">
+          Hủy chọn ảnh
+        </button>
+      </form>
+      <div id="image-preview" class="i">
         {% if filename %}
-            <h3>Ảnh đã tải lên:</h3>
-            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
+        <img
+          src="{{ url_for('static', filename='uploads/' + filename) }}"
+          alt="Uploaded Image"
+          style="width: 100%; height: 100%; object-fit: contain"
+        />
         {% endif %}
+      </div>
+    </div>
+    <div id="result_predict">
+      {% if percent %}
+      <h3>Kết quả dự đoạn</h3>
+      <ul>
+        {% for result in percent %}
+        <li>{{ result }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <div>
+        {% if percent %}
+        <h3>Tính trạng lá ngô dự đoán : {{ name }}</h3>
+        {% endif %}
+      </div>
     </div>
 
-    <div>
-        {% if percent %}
-            <h3>Kết quả dự đoạn</h3>
-            <ul>
-                {% for result in percent %}
-                    <li>{{ result }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-
-    <div>
-        {% if percent %}
-            <h3>Tính trạng lá ngô dự đoán :  {{ name }}</h3>
-        {% endif %}
-    </div>
+ 
 
     <script>
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imagePreview = document.getElementById('image-preview');
-                    imagePreview.innerHTML = `<h3>Ảnh bạn chọn:</h3><img src="${e.target.result}" alt="Image Preview">`;
-                };
-                reader.readAsDataURL(file);
-            }
+      function previewImage(event) {
+        const file = event.target.files[0];
+        const imagePreview = document.getElementById("image-preview");
+        const cancelButton = document.getElementById("cancel-button"); // Nút hủy
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" style="
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+            ">`;
+            imagePreview.classList.add("show");
+          };
+          reader.readAsDataURL(file);
+
+          // Hiển thị nút hủy khi có ảnh
+          cancelButton.style.display = "inline-block";
         }
+      }
+      function clearImage() {
+        const imagePreview = document.getElementById("image-preview");
+        const fileInput = document.getElementById("image");
+        const cancelButton = document.getElementById("cancel-button");
+        const result = document.getElementById("result_predict")
+
+        // Xóa ảnh trong preview
+        imagePreview.innerHTML = "";
+        imagePreview.classList.remove("show");
+        result.innerHTML = ""
+
+        // Reset input file
+        fileInput.value = "";
+
+        // Ẩn nút hủy
+        cancelButton.style.display = "none";
+      }
+
+      // Kiểm tra nếu có filename, thêm class 'show' vào #image-preview
+      window.onload = function () {
+        const imagePreview = document.getElementById("image-preview");
+        const filename = "{{ filename }}"; // Tham chiếu đến biến filename trong Jinja template
+
+        if (filename) {
+          // Nếu filename tồn tại, thêm class 'show' vào #image-preview
+          imagePreview.classList.add("show");
+        }
+      };
     </script>
-</body>
+  </body>
 </html>
