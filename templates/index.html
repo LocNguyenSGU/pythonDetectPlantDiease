@@ -27,6 +27,23 @@
         {% endif %}
     </div>
 
+    <div>
+        {% if percent %}
+            <h3>Kết quả dự đoạn</h3>
+            <ul>
+                {% for result in percent %}
+                    <li>{{ result }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {% if percent %}
+            <h3>Tính trạng lá ngô dự đoán :  {{ name }}</h3>
+        {% endif %}
+    </div>
+
     <script>
         function previewImage(event) {
             const file = event.target.files[0];
