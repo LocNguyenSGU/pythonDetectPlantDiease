@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tải lên ảnh</title>
+    <style>
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chọn và tải lên ảnh</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="image">Chọn ảnh:</label>
+        <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(event)">
+        <br><br>
+        <button type="submit">Tải lên</button>
+    </form>
+
+    <div id="image-preview">
+        {% if filename %}
+            <h3>Ảnh đã tải lên:</h3>
+            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
+        {% endif %}
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imagePreview = document.getElementById('image-preview');
+                    imagePreview.innerHTML = `<h3>Ảnh bạn chọn:</h3><img src="${e.target.result}" alt="Image Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
