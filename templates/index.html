@@ -198,7 +198,9 @@
         <br /><br />
         <div class="row-btn">
           <button type="submit" class="button_predict">Dự đoán bệnh</button>
-          <button type="button" class="btn_cancel" id="cancel-button" onclick="clearImage()">
+          <button type="button" class="btn_cancel" id="cancel-button" onclick="clearImage()"
+          style="display: {% if filename %}inline-block{% else %}none{% endif %};"
+          >
             Hủy chọn ảnh
           </button>
         </div>
